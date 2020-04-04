@@ -5,14 +5,94 @@
 		<style>
 			.niceText{
 				font-family: Arial, Helvetica, sans-serif;
+				text-align: center;			
+				}
+
+			.removeButton{
+				position: absolute;
+				left: 275px;
 			}
 		</style>
-		<script>
-
-		</script>
 	</head>
 	
-	<body>
+	<body onload="onLoad()">
+		<h2 class="niceText">Your game is:</h2>
+		<h1 class="niceText" id="gameName"></h1>
+		<h1>Possible Games:</h1>
+		<ul id="possibleGames">
+
+		</ul>
+		<button onclick="removeAll()">Remove All</button>
+		<button onclick="addNew()">Add New</button>
+		<br>
+		<input type="file" accept=".txt" id="fileInput">
+		<button onclick="loadText()" title="Choose a text file to load a pre-existing list of games from!">Load</button>
+
+		<button onclick="randomGame()"  id="buttonRandomGame" style="position:absolute; top:460px;">Generate New Random Game</button>
+
 
 	</body>
+	<script>
+		var listOfGames = ["Minecraft","Roblox","Rainbow Six Siege","Terraria","Don't Starve (Together?)","Literally go do some coding","Mindustry"]
+		var selectedGame;
+		var selectedGameDisplayId = document.getElementById("gameName");
+		var listOfGamesDisplayId = document.getElementById("possibleGames");
+		var userInputGame;
+		var selectedFile;
+		var textToRead;
+		var buttonRandomGame = document.getElementById("buttonRandomGame")
+
+		function randomGame() {
+			selectedGame = listOfGames[Math.floor(Math.random() * listOfGames.length)]
+			selectedGameDisplayId.innerHTML = selectedGame
+		}
+
+		function reloadGamesList() {
+			listOfGamesDisplayId.innerHTML = ""
+			for (var gameIndex in listOfGames) {
+				listOfGamesDisplayId.innerHTML += "<li> " + listOfGames[gameIndex] + "   <button class=\"removeButton\" onclick=\"removeEntry(this)\" id=\"removeButton"+ gameIndex + "\" data-game_index=" + gameIndex + ">X</button>" + "</li>"
+			}
+		}
+
+		function onLoad() {
+			buttonRandomGame.style.left = screen.width / 2 - 90 + "px"
+			randomGame()
+			reloadGamesList()
+		}
+
+		function removeEntry(element) {
+			listOfGames.splice(element.getAttribute("data-game_index"),1)
+			reloadGamesList()
+		}
+
+		function removeAll() {
+			listOfGames.splice(0)
+			reloadGamesList()
+		}
+
+		function addNew() {
+			userInputGame = prompt("Add new game");
+			if (userInputGame != null && userInputGame != "") {
+				listOfGames.push(userInputGame)
+			}
+			reloadGamesList()
+		}
+
+		async function loadText() {
+			selectedFile = document.getElementById('fileInput').files[0];
+			if (selectedFile != null && selectedFile.size < 4096) {
+				textToRead = await new Response(selectedFile).text()
+				for (var textIndex in textToRead.split("\n")) {
+					listOfGames.push(textToRead.split("\n")[textIndex])
+				}
+				reloadGamesList()
+			} else {
+				alert("Text file invalid! (It exceeds 4KB, or it is bad)")
+			}
+
+		}
+			
+		
+
+	</script>
 </html>
